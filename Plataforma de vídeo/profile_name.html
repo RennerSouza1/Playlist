@@ -1,0 +1,170 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Name Settings</title>
+  <link rel="icon" type="image/x-icon" href="testezzzz.jpeg">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background-color: #f5f5f5;
+      background-image: url('file.svg');
+    }
+
+    header {
+      margin-bottom: 20px;
+    }
+
+    img {
+      max-width: 100%; 
+      height: auto; 
+      max-height: 100px; 
+    }
+
+    form {
+      max-width: 400px;
+      width: 100%;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      box-sizing: border-box;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .success-message, .error-message {
+      margin-top: 16px;
+      padding: 8px;
+      border-radius: 4px;
+      display: none;
+      width: 20%;
+      text-align: center;
+      opacity: 1;
+      transition: opacity 0.5s ease-out;
+    }
+
+    .success-message {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .error-message {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .fade-out {
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="testeez.png" alt="Logo da sua empresa">
+  </header>
+
+  <form id="curlForm">
+    <label for="variavelId">ID da instância:</label>
+    <input type="text" id="variavelId" name="variavelId" required>
+
+    <label for="variavelToken">Token da instância:</label>
+    <input type="text" id="variavelToken" name="variavelToken" required>
+
+    <label for="clientToken">Client Token (Token de segurança):</label>
+    <input type="text" id="clientToken" name="clientToken" required>
+
+    <label for="valorVariavel">Nome novo:</label>
+    <input type="text" id="valorVariavel" name="valorVariavel" required>
+
+    <button type="button" onclick="enviarCurl()">Trocar nome do perfil</button>
+  </form>
+
+  <div class="success-message" id="successMessage">Solicitação bem-sucedida!</div>
+  <div class="error-message" id="errorMessage">Erro ao enviar a solicitação.</div>
+
+  <script>
+    async function enviarCurl() {
+      var variavelId = document.getElementById('variavelId').value;
+      var variavelToken = document.getElementById('variavelToken').value;
+      var clientToken = document.getElementById('clientToken').value;
+      var valorVariavel = document.getElementById('valorVariavel').value;
+
+      // Verifica se alguma variável é undefined
+      if (!variavelId || !variavelToken || !clientToken || !valorVariavel) {
+        alert('Preencha todos os campos antes de enviar a solicitação.');
+        return;
+      }
+
+      var url = `https://api.z-api.io/instances/${variavelId}/token/${variavelToken}/profile-name`;
+
+      var options = {
+        method: 'PUT',
+        headers: {
+          'Client-Token': clientToken,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          value: valorVariavel,
+        }),
+      };
+
+      try {
+        const response = await fetch(url, options);
+        const data = await response.json();
+        console.log(data);
+
+        // Mostrar mensagem de sucesso
+        const successMessage = document.getElementById('successMessage');
+        successMessage.style.display = 'block';
+        setTimeout(() => {
+          successMessage.classList.add('fade-out');
+        }, 2500);
+      } catch (error) {
+        console.error('Erro ao enviar a solicitação:', error);
+
+        // Mostrar mensagem de erro
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.style.display = 'block';
+        setTimeout(() => {
+          errorMessage.classList.add('fade-out');
+        }, 2500);
+      }
+    }
+  </script>
+
+</body>
+</html>

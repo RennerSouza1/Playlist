@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login com o Facebook e Cadastro Incorporado do WhatsApp</title>
+
+  <!-- SDK do Facebook -->
+  <script>
+    window.fbAsyncInit = function () {
+      FB.init({
+        appId: '1691868231553616', // Substitua pelo seu Facebook App ID
+        cookie: true, // Habilitar cookies para permitir acesso à sessão
+        xfbml: true, // Parse social plugins nesta página
+        version: 'v17.0' // Versão da Graph API a ser usada
+      });
+
+      // Iniciar o código do Facebook Pixel
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1691868231553616'); // Substitua pelo seu ID do Facebook Pixel
+      fbq('track', 'PageView');
+
+      // Função para tratar os eventos de sessão do WhatsApp
+      const sessionInfoListener = (event) => {
+        if (event.origin !== "https://www.facebook.com" && event.origin !== "https://web.facebook.com") {
+          return;
+        }
+        
+        try {
+          const data = JSON.parse(event.data);
+          if (data.type === 'WA_EMBEDDED_SIGNUP') {
+            // Se o usuário finalizar o fluxo de Cadastro Incorporado
+            if (data.event === 'FINISH') {
+              const { phone_number_id, waba_id } = data.data;
+              console.log('Usuário finalizou o cadastro:', phone_number_id, waba_id);
+              
+              // Aqui você pode implementar a lógica para enviar o phone_number_id e waba_id para o backend
+            }
+            // Se o usuário cancelar o fluxo de Cadastro Incorporado
+            else if (data.event === 'CANCEL') {
+              const { current_step } = data.data;
+              console.log('Usuário cancelou o cadastro no passo:', current_step);
+            }
+          }
+        } catch {
+          // Não parsear informações que não são JSON
+          console.log('Resposta não JSON:', event.data);
+        }
+      };
+
+      // Adicionar um ouvinte de evento para as informações de sessão
+      window.addEventListener('message', sessionInfoListener);  
+    };
+
+    // Carregar o SDK do Facebook de forma assíncrona
+    (function (d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) return;
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+    // Facebook Login with JavaScript SDK
+    function launchWhatsAppSignup() {
+      // Verificar se fbq está definido antes de chamar
+      if (typeof fbq !== 'undefined') {
+        fbq('trackCustom', 'WhatsAppOnboardingStart', { appId: 'your-facebook-app-id', feature: 'whatsapp_embedded_signup' });
+      }
+      
+      // Launch Facebook login
+      FB.login(function (response) {
+        if (response.authResponse) {
+          const code = response.authResponse.code;
+          // O código retornado deve ser transmitido para o seu backend
+          // que fará uma chamada de servidor para servidor para obter um token de acesso
+          // Verifique a documentação para obter detalhes sobre como trocar o código por um token
+        } else {
+          console.log('Usuário cancelou o login ou não autorizou completamente.');
+        }
+      }, {
+        config_id: '1403948496960240', // ID da configuração do WhatsApp Business
+        response_type: 'code',    // Deve ser 'code' para o token de acesso do sistema de usuário
+        override_default_response_type: true, // Quando verdadeiro, qualquer tipo de resposta passado em "response_type" terá precedência sobre os tipos padrão
+        extras: {
+          setup: {
+            // Dados pré-preenchidos podem ser incluídos aqui, se aplicável
+          }
+        }
+      });
+    }
+  </script>
+</head>
+<body>
+
+  <h1>Login com o Facebook e Cadastro Incorporado do WhatsApp</h1>
+
+  <!-- Botão de Login do Facebook -->
+  <button onclick="launchWhatsAppSignup()" style="background-color: #1877f2; border: 0; border-radius: 4px; color: #fff; cursor: pointer; font-family: Helvetica, Arial, sans-serif; font-size: 16px; font-weight: bold; height: 40px; padding: 0 24px;">Login com Facebook</button>
+
+</body>
+</html>
